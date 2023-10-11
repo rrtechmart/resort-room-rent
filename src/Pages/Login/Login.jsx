@@ -1,29 +1,48 @@
 import { Link, useNavigate } from 'react-router-dom'
-
+// import {ImSpinner3} from 'react-icons/im'
 import { FcGoogle } from 'react-icons/fc'
 import { useContext } from 'react'
 import { AuthContext } from '../../providers/AuthProvider'
+import toast from 'react-hot-toast'
 
 const Login = () => {
-    const {signIn} = useContext(AuthContext);
+    const { signIn, signInWithGoogle, setLoading } = useContext(AuthContext);
     const navigate = useNavigate()
 
-    const handleSubmit = event =>{
+    const handleSubmit = event => {
         event.preventDefault()
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password);
         signIn(email, password)
-        .then(result => {
-            const user = result.user;
-            console.log(user);
-            navigate('/')
-        })
-        .catch(error =>{
-            console.log(error);
-        })
-        
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                navigate('/')
+            })
+            .catch(error => {
+                console.log(error);
+            })
+
     }
+
+    // SignIn with google
+    const handleGoogleSignIn = () => {
+        signInWithGoogle()
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                toast.success('user loggedIn successfully')
+                navigate('/')
+
+            })
+            .catch(error => {
+                setLoading(false);
+                console.log(error.message);
+                toast.error(error.message);
+            })
+    }
+
     return (
         <div className='flex justify-center items-center min-h-screen'>
             <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -34,7 +53,7 @@ const Login = () => {
                     </p>
                 </div>
                 <form
-                onSubmit={handleSubmit}
+                    onSubmit={handleSubmit}
                     noValidate=''
                     action=''
                     className='space-y-6 ng-untouched ng-pristine ng-valid'
@@ -77,6 +96,7 @@ const Login = () => {
                             className='bg-rose-500 w-full rounded-md py-3 text-white'
                         >
                             Continue
+
                         </button>
                     </div>
                 </form>
@@ -92,7 +112,9 @@ const Login = () => {
                     </p>
                     <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
                 </div>
-                <div className='flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer'>
+                <div
+                onClick={handleGoogleSignIn}
+                 className='flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer'>
                     <FcGoogle size={32} />
 
                     <p>Continue with Google</p>
